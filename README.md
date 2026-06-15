@@ -10,44 +10,44 @@ A modern, full-stack personal finance management application with a premium SaaS
 
 ---
 
-## ✨ Features
+## Features
 
 ### Authentication
-- 🔐 JWT-based authentication (register, login, logout)
-- 🔒 Password hashing with bcrypt (12 salt rounds)
-- 🛡️ Protected routes with automatic token refresh
+- JWT-based authentication (register, login, logout)
+- Password hashing with bcrypt (12 salt rounds)
+- Protected routes with automatic token refresh
 
 ### Budget Tracking
-- ➕ Create, edit, and delete transactions
-- 📊 Income and expense categorization
-- 🏷️ Default categories + custom user categories
-- 📅 Date-based transaction tracking
-- 📝 Optional notes for each transaction
+- Create, edit, and delete transactions
+- Income and expense categorization
+- Default categories + custom user categories
+- Date-based transaction tracking
+- Optional notes for each transaction
 
 ### Dashboard
-- 💵 Summary cards (Total Income, Expenses, Balance, Monthly Savings)
-- 🥧 Expense breakdown pie chart
-- 📈 Monthly income vs expense bar chart (6-month trend)
-- 📋 Recent transactions list
+- Summary cards (Total Income, Expenses, Balance, Monthly Savings)
+- Expense breakdown pie chart
+- Monthly income vs expense bar chart (6-month trend)
+- Recent transactions list
 
 ### Filtering & Search
-- 🔍 Search transactions by title
-- 📅 Filter by date range
-- 🏷️ Filter by category
-- 💰 Filter by type (Income/Expense)
+- Search transactions by title
+- Filter by date range
+- Filter by category
+- Filter by type (Income/Expense)
 
 ### UI/UX
-- 🌙 Dark/Light mode toggle with system preference detection
-- 📱 Fully responsive (Mobile, Tablet, Desktop)
-- ✨ Glassmorphic cards with subtle animations
-- 🎨 Premium gradient accents
-- ⚡ Skeleton loading states
-- 🍞 Toast notifications
-- 🛡️ Error boundaries
+- Dark/Light mode toggle with system preference detection
+- Fully responsive (Mobile, Tablet, Desktop)
+- Glassmorphic cards with subtle animations
+- Premium gradient accents
+- Skeleton loading states
+- Toast notifications
+- Error boundaries
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 | Technology | Purpose |
@@ -81,7 +81,7 @@ A modern, full-stack personal finance management application with a premium SaaS
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 azentrix-fullstack-task1/
@@ -132,7 +132,7 @@ azentrix-fullstack-task1/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js ≥ 20.x
@@ -200,7 +200,7 @@ npm run dev
 
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Authentication
 | Method | Endpoint | Description |
@@ -234,7 +234,7 @@ npm run dev
 
 ---
 
-## 🌐 Deployment Guide
+## Deployment Guide
 
 ### Database — Neon PostgreSQL
 1. Create a Neon account at [neon.tech](https://neon.tech)
@@ -264,7 +264,7 @@ npm run dev
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
 ```
 ┌──────────┐       ┌──────────────┐       ┌───────────────┐
@@ -284,7 +284,7 @@ npm run dev
 
 ---
 
-## 📋 Environment Variables
+## Environment Variables
 
 ### Server (`server/.env`)
 | Variable | Description | Required |
@@ -304,7 +304,7 @@ npm run dev
 
 ---
 
-## 🧪 Validation Rules
+## Validation Rules
 
 ### Authentication
 - Email: Valid email format
@@ -320,12 +320,12 @@ npm run dev
 
 ---
 
-## 📄 License
+## License
 
 This project is built for the Azentrix internship selection task.
 
 ---
 
-## 👤 Author
+## Author
 
 **Prasanth Golla**
