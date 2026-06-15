@@ -1,0 +1,316 @@
+import { useState, useEffect } from "react";
+import { Transaction, CreateTransactionInput } from "@/types/transaction";
+import { Category } from "@/types/category";
+import { formatDateInput } from "@/lib/utils";
+import { X, Loader2, Calendar, FileText, IndianRupee } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Utensils,
+  ShoppingBag,
+  Car,
+  Tv,
+  Lightbulb,
+  Heart,
+  BookOpen,
+  TrendingUp,
+  Briefcase,
+  DollarSign
+} from "lucide-react";
+
+interface TransactionFormProps {
+  categories: Category[];
+  transaction?: Transaction | null;
+  onSubmit: (data: CreateTransactionInput) => Promise<void>;
+  onClose: () => void;
+}
+
+// Icon mapping helper
+const getCategoryIcon = (name: string) => {
+  const normalized = name.toLowerCase();
+  if (normalized.includes("food") || normalized.includes("dine") || normalized.includes("restaurant")) return Utensils;
+  if (normalized.includes("shop") || normalized.includes("clothes") || normalized.includes("groceries")) return ShoppingBag;
+  if (normalized.includes("travel") || normalized.includes("cab") || normalized.includes("transport") || normalized.includes("fuel")) return Car;
+  if (normalized.includes("entertainment") || normalized.includes("movie") || normalized.includes("sub") || normalized.includes("show")) return Tv;
+  if (normalized.includes("bill") || normalized.includes("utility") || normalized.includes("electricity") || normalized.includes("rent")) return Lightbulb;
+  if (normalized.includes("health") || normalized.includes("medical") || normalized.includes("medicine")) return Heart;
+  if (normalized.includes("education") || normalized.includes("book") || normalized.includes("course")) return BookOpen;
+  if (normalized.includes("save") || normalized.includes("invest") || normalized.includes("stock")) return TrendingUp;
+  if (normalized.includes("salary") || normalized.includes("wage") || normalized.includes("work")) return Briefcase;
+  return DollarSign;
+};
+
+export default function TransactionForm({
+  categories,
+  transaction,
+  onSubmit,
+  onClose,
+}: TransactionFormProps) {
+  const [type, setType] = useState<"INCOME" | "EXPENSE">(
+    transaction?.type || "EXPENSE"
+  );
+  const [title, setTitle] = useState(transaction?.title || "");
+  const [amount, setAmount] = useState(transaction?.amount?.toString() || "");
+  const [categoryId, setCategoryId] = useState(transaction?.categoryId || "");
+  const [date, setDate] = useState(
+    transaction ? formatDateInput(transaction.date) : formatDateInput(new Date())
+  );
+  const [notes, setNotes] = useState(transaction?.notes || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const isEditing = !!transaction;
+  const filteredCategories = categories.filter((c) => c.type === type);
+
+  // Auto-select first category as default when type changes
+  useEffect(() => {
+    if (!isEditing && filteredCategories.length > 0) {
+      setCategoryId(filteredCategories[0].id);
+    }
+  }, [type, isEditing, categories]);
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!title.trim()) newErrors.title = "Title is required";
+    if (!amount || parseFloat(amount) <= 0)
+      newErrors.amount = "Amount must be greater than zero";
+    if (!categoryId) newErrors.categoryId = "Category is required";
+    if (!date) newErrors.date = "Date is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        title: title.trim(),
+        amount: parseFloat(amount),
+        type,
+        categoryId,
+        date,
+        notes: notes.trim() || undefined,
+      });
+    } catch {
+      // Error handled by parent
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+        onClick={onClose}
+      />
+
+      {/* Modal Container */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+        className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-md p-6 bg-brand-card border border-brand-border shadow-[0_24px_50px_var(--shadow-color)] z-10 no-scrollbar text-brand-text"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 pb-3 border-b border-brand-border">
+          <div>
+            <h2 className="text-lg font-bold text-brand-text tracking-tight animate-fade-in">
+              {isEditing ? "Edit Transaction" : "New Ledger Entry"}
+            </h2>
+            <p className="text-xs text-brand-muted font-light mt-0.5">
+              Record a financial activity in your command ledger.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-md transition-all duration-200 hover:bg-brand-card/50 text-brand-muted hover:text-brand-text"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Type Toggle - Premium Segmented Control */}
+          <div className="flex p-1 bg-brand-bg rounded-md border border-brand-border">
+            {(["EXPENSE", "INCOME"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setType(t)}
+                className={`relative flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-200 ${
+                  type === t
+                    ? t === "INCOME"
+                      ? "bg-brand-success text-brand-bg shadow-sm"
+                      : "bg-brand-expense text-white shadow-sm"
+                    : "text-brand-muted hover:text-brand-text"
+                }`}
+              >
+                {t === "INCOME" ? "Income Deposit" : "Expense Burn"}
+              </button>
+            ))}
+          </div>
+
+          {/* Amount */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-muted mb-1.5">
+              Amount (₹) *
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brand-muted">
+                <IndianRupee size={14} />
+              </div>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  setErrors((prev) => ({ ...prev, amount: "" }));
+                }}
+                placeholder="0.00"
+                min="0.01"
+                step="0.01"
+                required
+                className="w-full pl-9 pr-4 py-2.5 rounded-md text-sm bg-brand-bg border border-brand-border text-brand-text placeholder-brand-muted/40 focus:border-brand-accent focus:outline-none transition-all"
+              />
+            </div>
+            {errors.amount && <p className="text-[10px] text-brand-expense mt-1 font-medium">{errors.amount}</p>}
+          </div>
+
+          {/* Title */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-muted mb-1.5">
+              Title *
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brand-muted">
+                <FileText size={14} />
+              </div>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setErrors((prev) => ({ ...prev, title: "" }));
+                }}
+                placeholder="e.g. Salary, Groceries, Cab fare"
+                required
+                className="w-full pl-9 pr-4 py-2.5 rounded-md text-sm bg-brand-bg border border-brand-border text-brand-text placeholder-brand-muted/40 focus:border-brand-accent focus:outline-none transition-all"
+              />
+            </div>
+            {errors.title && <p className="text-[10px] text-brand-expense mt-1 font-medium">{errors.title}</p>}
+          </div>
+
+          {/* Category Selector Grid - Premium Replacement for dropdowns */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-muted mb-2">
+              Select Category *
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[160px] overflow-y-auto pr-1 no-scrollbar">
+              {filteredCategories.map((cat) => {
+                const CatIcon = getCategoryIcon(cat.name);
+                const isSelected = categoryId === cat.id;
+
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => {
+                      setCategoryId(cat.id);
+                      setErrors((prev) => ({ ...prev, categoryId: "" }));
+                    }}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-semibold transition-all border ${
+                      isSelected
+                        ? type === "INCOME"
+                          ? "bg-brand-success/15 border-brand-success text-brand-success"
+                          : "bg-brand-expense/15 border-brand-expense text-brand-expense"
+                        : "bg-brand-bg border-brand-border text-brand-muted hover:text-brand-text hover:border-brand-border"
+                    }`}
+                  >
+                    <CatIcon size={13} />
+                    <span className="truncate">{cat.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {errors.categoryId && <p className="text-[10px] text-brand-expense mt-1 font-medium">{errors.categoryId}</p>}
+          </div>
+
+          {/* Date */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-muted mb-1.5">
+              Date *
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brand-muted">
+                <Calendar size={14} />
+              </div>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setErrors((prev) => ({ ...prev, date: "" }));
+                }}
+                required
+                className="w-full pl-9 pr-4 py-2.5 rounded-md text-sm bg-brand-bg border border-brand-border text-brand-text focus:border-brand-accent focus:outline-none transition-all"
+              />
+            </div>
+            {errors.date && <p className="text-[10px] text-brand-expense mt-1 font-medium">{errors.date}</p>}
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-muted mb-1.5">
+              Notes (optional)
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Record details or tags..."
+              rows={2}
+              className="w-full px-4 py-2.5 rounded-md text-sm bg-brand-bg border border-brand-border text-brand-text placeholder-brand-muted/40 focus:border-brand-accent focus:outline-none transition-all resize-none"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-3 border-t border-brand-border">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-2.5 rounded-md text-xs font-bold bg-brand-muted/10 text-brand-muted hover:text-brand-text hover:bg-brand-muted/20 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 py-2.5 rounded-md text-xs font-bold text-white bg-gradient-to-tr from-brand-accent to-brand-accent/80 transition-all hover:opacity-95 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Saving...
+                </>
+              ) : isEditing ? (
+                "Update entry"
+              ) : (
+                "Log entry"
+              )}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
