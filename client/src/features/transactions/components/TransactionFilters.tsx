@@ -44,15 +44,15 @@ export default function TransactionFilters({
             placeholder="Search ledger entries by title..."
             value={filters.search || ""}
             onChange={(e) => onFilterChange({ search: e.target.value })}
-            className="w-full pl-10 pr-4 py-2.5 rounded-md text-xs bg-brand-card/40 border border-brand-border text-brand-text placeholder-brand-muted/40 focus:border-brand-accent focus:outline-none transition-all duration-200"
+            className="w-full pl-10 pr-4 py-2.5 rounded-md text-xs bg-brand-bg border border-brand-border text-brand-text placeholder-brand-muted/40 focus:border-brand-accent focus:outline-none transition-all duration-200"
           />
         </div>
         <button
           onClick={() => setShowFilters(!showFilters)}
           className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-xs font-bold transition-all duration-200 border ${
             hasActiveFilters 
-              ? "bg-gradient-to-tr from-brand-accent to-brand-accent/80 text-white border-transparent" 
-              : "bg-brand-card/40 border-brand-border text-brand-muted hover:text-brand-text hover:border-brand-border"
+              ? "bg-brand-text text-brand-bg border-transparent hover:opacity-90" 
+              : "bg-brand-bg border-brand-border text-brand-muted hover:text-brand-text hover:border-brand-border"
           }`}
         >
           <Filter size={14} />

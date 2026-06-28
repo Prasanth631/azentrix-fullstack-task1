@@ -57,6 +57,9 @@ export class TransactionRepository {
           category: {
             select: { id: true, name: true, type: true },
           },
+          tags: {
+            select: { id: true, name: true },
+          },
         },
         orderBy: { [pagination.sortBy]: pagination.sortOrder },
         skip,
@@ -81,6 +84,9 @@ export class TransactionRepository {
         category: {
           select: { id: true, name: true, type: true },
         },
+        tags: {
+          select: { id: true, name: true },
+        },
       },
     });
   }
@@ -93,12 +99,25 @@ export class TransactionRepository {
     notes?: string;
     categoryId: string;
     userId: string;
+    isRecurring?: boolean;
+    recurringInterval?: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+    tagIds?: string[];
   }) {
+    const { tagIds, ...transactionData } = data;
+    
     return prisma.transaction.create({
-      data,
+      data: {
+        ...transactionData,
+        tags: tagIds && tagIds.length > 0 ? {
+          connect: tagIds.map(id => ({ id }))
+        } : undefined,
+      },
       include: {
         category: {
           select: { id: true, name: true, type: true },
+        },
+        tags: {
+          select: { id: true, name: true },
         },
       },
     });
@@ -114,21 +133,33 @@ export class TransactionRepository {
       date: Date;
       notes: string;
       categoryId: string;
+      isRecurring: boolean;
+      recurringInterval: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+      tagIds: string[];
     }>
   ) {
-    return prisma.transaction.updateMany({
-      where: { id, userId },
-      data,
-    }).then(async (result) => {
-      if (result.count === 0) return null;
-      return prisma.transaction.findFirst({
-        where: { id, userId },
-        include: {
-          category: {
-            select: { id: true, name: true, type: true },
-          },
+    // Verify ownership first since updateMany doesn't support relations
+    const existing = await prisma.transaction.findFirst({ where: { id, userId } });
+    if (!existing) return null;
+
+    const { tagIds, ...updateData } = data;
+
+    return prisma.transaction.update({
+      where: { id },
+      data: {
+        ...updateData,
+        tags: tagIds ? {
+          set: tagIds.map(tagId => ({ id: tagId }))
+        } : undefined,
+      },
+      include: {
+        category: {
+          select: { id: true, name: true, type: true },
         },
-      });
+        tags: {
+          select: { id: true, name: true },
+        },
+      },
     });
   }
 

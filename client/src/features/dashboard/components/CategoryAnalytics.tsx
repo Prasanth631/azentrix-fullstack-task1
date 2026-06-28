@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { ExpenseBreakdown } from "@/types/dashboard";
+import { BudgetProgress } from "@/types/transaction";
 import { motion } from "framer-motion";
 import {
   Utensils,
@@ -16,6 +17,7 @@ import {
 
 interface CategoryAnalyticsProps {
   data: ExpenseBreakdown[];
+  budgetProgress?: BudgetProgress[];
   totalIncome?: number;
   totalExpense?: number;
   isLoading?: boolean;
@@ -48,7 +50,7 @@ const getCategoryColor = (index: number) => {
   return colors[index % colors.length];
 };
 
-export default function CategoryAnalytics({ data, totalIncome = 0, totalExpense = 0, isLoading }: CategoryAnalyticsProps) {
+export default function CategoryAnalytics({ data, budgetProgress = [], totalIncome = 0, totalExpense = 0, isLoading }: CategoryAnalyticsProps) {
   // Sort data descending by amount to get top categories
   const sortedCategories = useMemo(() => {
     return [...data].sort((a, b) => b.amount - a.amount).slice(0, 5);
@@ -73,9 +75,9 @@ export default function CategoryAnalytics({ data, totalIncome = 0, totalExpense 
   return (
     <div className="glass-card p-6 bg-brand-card/45 backdrop-blur-md border border-brand-border flex flex-col justify-between h-full">
       <div>
-        <h3 className="text-sm font-semibold tracking-wide text-brand-text">CATEGORY PERFORMANCE</h3>
+        <h3 className="text-sm font-semibold tracking-wide text-brand-text">CATEGORY PERFORMANCE & BUDGETS</h3>
         <p className="text-[11px] text-brand-muted font-light mb-6">
-          Realtime breakdown of discretionary burn rates and velocity limits.
+          Realtime breakdown of discretionary burn rates and budget limits.
         </p>
       </div>
 
@@ -134,8 +136,15 @@ export default function CategoryAnalytics({ data, totalIncome = 0, totalExpense 
               const Icon = getCategoryIcon(item.category);
               const colorInfo = getCategoryColor(idx);
               
-              // Calculate percentage of category amount in relation to total expense
-              const percentage = totalExpense > 0 ? (item.amount / totalExpense) * 100 : 0;
+              const budget = budgetProgress.find(b => b.category?.name === item.category);
+
+              // Calculate percentage based on budget limit if it exists, otherwise based on total expense
+              const percentage = budget
+                ? Math.min((item.amount / budget.amount) * 100, 100)
+                : (totalExpense > 0 ? (item.amount / totalExpense) * 100 : 0);
+
+              const isOverBudget = budget && item.amount > budget.amount;
+              const barColor = isOverBudget ? "bg-brand-expense" : colorInfo.bg;
 
               return (
                 <div key={item.category} className="space-y-1.5 group">
@@ -144,13 +153,14 @@ export default function CategoryAnalytics({ data, totalIncome = 0, totalExpense 
                       <div className={`p-1.5 rounded-lg bg-brand-bg border border-brand-border ${colorInfo.text} group-hover:opacity-80 transition-opacity duration-200`}>
                         <Icon size={13} />
                       </div>
-                      <span className="text-brand-text font-semibold group-hover:text-brand-accent transition-colors">
+                      <span className="text-brand-text font-semibold group-hover:text-brand-accent transition-colors flex items-center gap-2">
                         {item.category}
+                        {budget && <span className="text-[8px] bg-brand-accent/20 text-brand-accent px-1.5 py-[1px] rounded-[4px] uppercase tracking-wider">Budget Set</span>}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-brand-muted font-light">
-                        ₹{item.amount.toLocaleString()}
+                      <span className={`font-light ${isOverBudget ? "text-brand-expense font-bold" : "text-brand-muted"}`}>
+                        {budget ? `₹${item.amount.toLocaleString()} / ₹${budget.amount.toLocaleString()}` : `₹${item.amount.toLocaleString()}`}
                       </span>
                       <span className="text-[9px] font-semibold text-brand-muted">
                         {percentage.toFixed(0)}%
@@ -164,12 +174,12 @@ export default function CategoryAnalytics({ data, totalIncome = 0, totalExpense 
                       initial={{ width: 0 }}
                       animate={{ width: `${percentage}%` }}
                       transition={{ duration: 1, ease: "easeOut", delay: idx * 0.1 }}
-                      className={`h-full rounded-full ${colorInfo.bg}`}
+                      className={`h-full rounded-full ${barColor}`}
                     />
                   </div>
                   <div className="flex justify-between items-center text-[9px] text-brand-muted px-0.5 font-light">
-                    <span>Allocation</span>
-                    <span>{percentage.toFixed(0)}% of expenses</span>
+                    <span>{budget ? "Budget Limit" : "Allocation"}</span>
+                    <span>{budget ? `${percentage.toFixed(0)}% of limit` : `${percentage.toFixed(0)}% of expenses`}</span>
                   </div>
                 </div>
               );

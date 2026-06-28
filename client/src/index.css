@@ -132,16 +132,14 @@ body {
   transform: translateY(-2px);
 }
 
-/* Gradient background */
+/* Solid accent background for logos/icons */
 .gradient-bg {
-  background: linear-gradient(135deg, #7C5CFF 0%, #00DFA2 100%);
+  background-color: var(--text-primary);
+  color: var(--bg-primary) !important;
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #F8FAFC 0%, #94A3B8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
 }
 
 /* Animations */
@@ -284,9 +282,9 @@ textarea:focus {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.toast-success { background: linear-gradient(135deg, #16C47F, #00DFA2); }
-.toast-error { background: linear-gradient(135deg, #FF5D73, #E11D48); }
-.toast-info { background: linear-gradient(135deg, #7C5CFF, #6366F1); }
+.toast-success { background-color: var(--success-color); }
+.toast-error { background-color: var(--expense-color); }
+.toast-info { background-color: var(--text-primary); color: var(--bg-primary); }
 
 /* Skeleton loading */
 .skeleton {

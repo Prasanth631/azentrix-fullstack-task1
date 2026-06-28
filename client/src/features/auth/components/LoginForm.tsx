@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useToast } from "@/hooks/useToast";
-import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Loader2, Activity } from "lucide-react";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -40,11 +40,11 @@ export default function LoginForm() {
       <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-brand-accent/5 blur-xl pointer-events-none" />
 
       {/* Brand logo for mobile view */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-tr from-brand-accent to-[#00DFA2]">
-          <span className="text-base font-black text-white">FL</span>
+      <div className="flex items-center gap-2 mb-8">
+        <div className="flex items-center justify-center text-brand-text">
+          <Activity size={28} strokeWidth={2.5} />
         </div>
-        <h1 className="text-lg font-bold tracking-tight text-brand-text">FlowLedger</h1>
+        <span className="text-xl font-bold tracking-tight text-brand-text">FlowLedger</span>
       </div>
 
       <div className="mb-6">
@@ -113,7 +113,7 @@ export default function LoginForm() {
           id="login-submit"
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-2.5 rounded-md text-white text-xs font-bold bg-gradient-to-tr from-brand-accent to-brand-accent/80 transition-all hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+          className="w-full py-2.5 rounded-md bg-brand-text text-brand-bg text-xs font-bold transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
         >
           {isSubmitting ? (
             <>

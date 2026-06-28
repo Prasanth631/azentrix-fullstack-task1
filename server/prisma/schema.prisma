@@ -13,6 +13,13 @@ enum TransactionType {
   EXPENSE
 }
 
+enum RecurringInterval {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
 model User {
   id           String        @id @default(cuid())
   name         String
@@ -21,6 +28,8 @@ model User {
   createdAt    DateTime      @default(now())
   categories   Category[]
   transactions Transaction[]
+  tags         Tag[]
+  budgets      Budget[]
 
   @@map("users")
 }
@@ -33,6 +42,7 @@ model Category {
   userId       String?
   user         User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
+  budgets      Budget[]
   createdAt    DateTime        @default(now())
 
   @@unique([name, type, userId])
@@ -40,20 +50,53 @@ model Category {
 }
 
 model Transaction {
-  id         String          @id @default(cuid())
-  title      String
-  amount     Float
-  type       TransactionType
-  date       DateTime
-  notes      String?
-  categoryId String
-  category   Category        @relation(fields: [categoryId], references: [id])
-  userId     String
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt  DateTime        @default(now())
+  id                String             @id @default(cuid())
+  title             String
+  amount            Float
+  type              TransactionType
+  date              DateTime
+  notes             String?
+  categoryId        String
+  category          Category           @relation(fields: [categoryId], references: [id])
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isRecurring       Boolean            @default(false)
+  recurringInterval RecurringInterval?
+  nextRecurringDate DateTime?
+  tags              Tag[]
+  createdAt         DateTime           @default(now())
 
   @@index([userId, date])
   @@index([userId, type])
   @@index([userId, categoryId])
   @@map("transactions")
+}
+
+model Tag {
+  id           String        @id @default(cuid())
+  name         String
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+
+  @@unique([name, userId])
+  @@map("tags")
+}
+
+model Budget {
+  id         String   @id @default(cuid())
+  amount     Float
+  month      Int
+  year       Int
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([categoryId, month, year, userId])
+  @@index([userId, month, year])
+  @@map("budgets")
 }

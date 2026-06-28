@@ -23,7 +23,7 @@ export default function FloatingActionButton({ onClick, visible = true }: Floati
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           onClick={onClick}
-          className="fixed bottom-20 md:bottom-8 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-tr from-[#7C5CFF] to-[#6366F1] text-white shadow-md border border-brand-border outline-none focus:ring-2 focus:ring-[#7C5CFF] focus:ring-offset-2 focus:ring-offset-[#0B1020]"
+          className="fixed bottom-20 md:bottom-8 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-brand-accent text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-brand-accent/30 border border-white/10 outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2 focus:ring-offset-brand-bg hover:bg-brand-accent/90 transition-colors"
           aria-label="Add transaction"
         >
           <motion.div

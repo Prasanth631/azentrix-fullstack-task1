@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import { Activity } from "lucide-react";
 
 export default function AuthLayout() {
   return (
@@ -12,15 +13,15 @@ export default function AuthLayout() {
         <div className="relative z-10">
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-tr from-brand-accent to-[#00DFA2]">
-                <span className="text-xl font-black text-white">FL</span>
+              <div className="flex items-center justify-center text-brand-text">
+                <Activity size={32} strokeWidth={2.5} />
               </div>
               <h1 className="text-2xl font-bold tracking-tight text-brand-text">FlowLedger</h1>
             </div>
             <h2 className="text-4xl font-extrabold text-brand-text leading-tight mb-4 tracking-tight">
               Understand where
               <br />
-              <span className="bg-gradient-to-r from-brand-accent to-[#00DFA2] bg-clip-text text-transparent">
+              <span className="text-brand-text">
                 your money goes.
               </span>
             </h2>

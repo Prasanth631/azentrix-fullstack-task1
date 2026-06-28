@@ -60,9 +60,9 @@ export default function RecentTransactions({
                 }}
               >
                 {tx.type === "INCOME" ? (
-                  <ArrowUpRight size={18} style={{ color: "#10B981" }} />
+                  <ArrowUpRight size={18} style={{ color: "var(--income-color)" }} />
                 ) : (
-                  <ArrowDownRight size={18} style={{ color: "#F43F5E" }} />
+                  <ArrowDownRight size={18} style={{ color: "var(--expense-color)" }} />
                 )}
               </div>
 
@@ -81,7 +81,7 @@ export default function RecentTransactions({
               <span
                 className="text-sm font-semibold shrink-0"
                 style={{
-                  color: tx.type === "INCOME" ? "#10B981" : "#F43F5E",
+                  color: tx.type === "INCOME" ? "var(--income-color)" : "var(--expense-color)",
                 }}
               >
                 {tx.type === "INCOME" ? "+" : "-"}

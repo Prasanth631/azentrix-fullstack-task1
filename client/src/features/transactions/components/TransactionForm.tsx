@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Transaction, CreateTransactionInput } from "@/types/transaction";
+import { Transaction, CreateTransactionInput, Tag, RecurringInterval } from "@/types/transaction";
 import { Category } from "@/types/category";
 import { formatDateInput } from "@/lib/utils";
-import { X, Loader2, Calendar, FileText, IndianRupee } from "lucide-react";
+import { X, Loader2, Calendar, FileText, IndianRupee, Tag as TagIcon, Repeat, Plus } from "lucide-react";
+import { tagService } from "../services/tagService";
 import { motion } from "framer-motion";
 import {
   Utensils,
@@ -55,8 +56,41 @@ export default function TransactionForm({
     transaction ? formatDateInput(transaction.date) : formatDateInput(new Date())
   );
   const [notes, setNotes] = useState(transaction?.notes || "");
+  const [isRecurring, setIsRecurring] = useState(transaction?.isRecurring || false);
+  const [recurringInterval, setRecurringInterval] = useState<RecurringInterval>(
+    transaction?.recurringInterval || "MONTHLY"
+  );
+  
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
+    transaction?.tags?.map(t => t.id) || []
+  );
+  const [newTagName, setNewTagName] = useState("");
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    tagService.getAll().then(setAvailableTags).catch(console.error);
+  }, []);
+
+  const handleCreateTag = async () => {
+    if (!newTagName.trim()) return;
+    try {
+      const tag = await tagService.create(newTagName.trim());
+      setAvailableTags(prev => [...prev, tag]);
+      setSelectedTagIds(prev => [...prev, tag.id]);
+      setNewTagName("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const toggleTag = (id: string) => {
+    setSelectedTagIds(prev => 
+      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]
+    );
+  };
 
   const isEditing = !!transaction;
   const filteredCategories = categories.filter((c) => c.type === type);
@@ -95,6 +129,9 @@ export default function TransactionForm({
         categoryId,
         date,
         notes: notes.trim() || undefined,
+        tagIds: selectedTagIds,
+        isRecurring,
+        recurringInterval: isRecurring ? recurringInterval : undefined,
       });
     } catch {
       // Error handled by parent
@@ -277,10 +314,99 @@ export default function TransactionForm({
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Record details or tags..."
+              placeholder="Record details..."
               rows={2}
               className="w-full px-4 py-2.5 rounded-md text-sm bg-brand-bg border border-brand-border text-brand-text placeholder-brand-muted/40 focus:border-brand-accent focus:outline-none transition-all resize-none"
             />
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-muted mb-1.5 flex items-center gap-1.5">
+              <TagIcon size={12} /> Tags
+            </label>
+            <div className="flex flex-col gap-2">
+              {availableTags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {availableTags.map(tag => (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => toggleTag(tag.id)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-bold tracking-wide uppercase transition-all border ${
+                        selectedTagIds.includes(tag.id)
+                          ? "bg-brand-accent/20 border-brand-accent/40 text-brand-accent"
+                          : "bg-brand-bg border-brand-border text-brand-muted hover:text-brand-text"
+                      }`}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleCreateTag();
+                    }
+                  }}
+                  placeholder="New tag..."
+                  className="flex-1 px-3 py-1.5 rounded-md text-xs bg-brand-bg border border-brand-border text-brand-text placeholder-brand-muted/40 focus:border-brand-accent focus:outline-none transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={handleCreateTag}
+                  disabled={!newTagName.trim()}
+                  className="p-1.5 rounded-md bg-brand-bg border border-brand-border text-brand-muted hover:text-brand-accent hover:border-brand-accent/30 disabled:opacity-50 transition-all"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Recurring */}
+          <div className="p-3 rounded-lg border border-brand-border bg-brand-bg/50">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-brand-text flex items-center gap-1.5">
+                <Repeat size={14} className="text-brand-accent" /> Make Recurring
+              </label>
+              <div
+                className={`w-8 h-4 rounded-full p-0.5 cursor-pointer transition-colors ${
+                  isRecurring ? "bg-brand-accent" : "bg-brand-border"
+                }`}
+                onClick={() => setIsRecurring(!isRecurring)}
+              >
+                <div
+                  className={`w-3 h-3 bg-white rounded-full transition-transform ${
+                    isRecurring ? "translate-x-4" : "translate-x-0"
+                  }`}
+                />
+              </div>
+            </div>
+            {isRecurring && (
+              <div className="flex gap-2 mt-3 pt-3 border-t border-brand-border/50">
+                {(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"] as RecurringInterval[]).map((interval) => (
+                  <button
+                    key={interval}
+                    type="button"
+                    onClick={() => setRecurringInterval(interval)}
+                    className={`flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all ${
+                      recurringInterval === interval
+                        ? "bg-brand-accent text-white shadow-sm shadow-brand-accent/20"
+                        : "bg-brand-bg text-brand-muted border border-brand-border hover:text-brand-text"
+                    }`}
+                  >
+                    {interval}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Actions */}
@@ -295,7 +421,7 @@ export default function TransactionForm({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-2.5 rounded-md text-xs font-bold text-white bg-gradient-to-tr from-brand-accent to-brand-accent/80 transition-all hover:opacity-95 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 rounded-md text-xs font-bold bg-brand-text text-brand-bg transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <>

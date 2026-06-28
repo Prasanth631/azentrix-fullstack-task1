@@ -13,7 +13,7 @@ export default function NotFoundPage() {
         </p>
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-md text-white font-semibold gradient-bg transition-all duration-200 hover:opacity-90 hover:shadow-lg"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-brand-text text-brand-bg font-semibold transition-all duration-200 hover:opacity-90 hover:shadow-lg"
         >
           Go to Dashboard
         </Link>

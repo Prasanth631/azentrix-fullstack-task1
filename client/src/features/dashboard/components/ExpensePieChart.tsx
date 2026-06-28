@@ -15,16 +15,16 @@ interface ExpensePieChartProps {
 }
 
 const COLORS = [
-  "#6366F1",
-  "#F43F5E",
-  "#10B981",
-  "#F59E0B",
-  "#8B5CF6",
-  "#EC4899",
-  "#14B8A6",
-  "#F97316",
-  "#06B6D4",
-  "#84CC16",
+  "var(--primary-500)",
+  "var(--expense-color)",
+  "var(--income-color)",
+  "var(--primary-400)",
+  "var(--primary-600)",
+  "var(--text-secondary)",
+  "var(--primary-300)",
+  "var(--text-tertiary)",
+  "var(--primary-700)",
+  "var(--border-color)",
 ];
 
 export default function ExpensePieChart({ data, isLoading }: ExpensePieChartProps) {

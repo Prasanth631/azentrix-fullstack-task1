@@ -16,6 +16,9 @@ export const createTransactionSchema = z.object({
       message: "Invalid date format",
     }),
     notes: z.string().max(500, "Notes must be less than 500 characters").optional(),
+    tagIds: z.array(z.string()).optional(),
+    isRecurring: z.boolean().optional(),
+    recurringInterval: z.enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]).optional(),
   }),
 });
 
@@ -44,6 +47,9 @@ export const updateTransactionSchema = z.object({
       })
       .optional(),
     notes: z.string().max(500).optional(),
+    tagIds: z.array(z.string()).optional(),
+    isRecurring: z.boolean().optional(),
+    recurringInterval: z.enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]).optional(),
   }),
 });
 

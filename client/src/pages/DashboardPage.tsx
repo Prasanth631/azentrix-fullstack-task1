@@ -5,8 +5,9 @@ import { useToast } from "@/hooks/useToast";
 import { dashboardService } from "@/features/dashboard/services/dashboardService";
 import { transactionService } from "@/features/transactions/services/transactionService";
 import { categoryService } from "@/features/transactions/services/categoryService";
+import { budgetService } from "@/features/transactions/services/budgetService";
 import { DashboardSummary, ExpenseBreakdown, MonthlyTrend } from "@/types/dashboard";
-import { Transaction } from "@/types/transaction";
+import { Transaction, BudgetProgress } from "@/types/transaction";
 import { Category } from "@/types/category";
 
 import SpendingHeatmap from "@/features/dashboard/components/SpendingHeatmap";
@@ -30,6 +31,7 @@ export default function DashboardPage() {
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlyTrend[]>([]);
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [greeting, setGreeting] = useState("Good Evening");
@@ -53,12 +55,13 @@ export default function DashboardPage() {
   async function loadDashboardData() {
     setIsLoading(true);
     try {
-      const [summaryData, breakdownData, trendData, txData, catData] = await Promise.all([
+      const [summaryData, breakdownData, trendData, txData, catData, budgetData] = await Promise.all([
         dashboardService.getSummary(),
         dashboardService.getExpenseBreakdown(),
         dashboardService.getMonthlyTrend(),
         transactionService.getAll({ limit: 500, sortBy: "date", sortOrder: "desc" }),
         categoryService.getAll(),
+        budgetService.getProgress(),
       ]);
 
       setSummary(summaryData);
@@ -66,6 +69,7 @@ export default function DashboardPage() {
       setMonthlyTrend(trendData);
       setAllTransactions(txData.data);
       setCategories(catData);
+      setBudgetProgress(budgetData);
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
       showToast("Failed to sync financial parameters", "error");
@@ -140,6 +144,7 @@ export default function DashboardPage() {
               <div className="lg:col-span-5">
                 <CategoryAnalytics
                   data={expenseBreakdown}
+                  budgetProgress={budgetProgress}
                   totalIncome={summary?.totalIncome}
                   totalExpense={summary?.totalExpenses}
                   isLoading={isLoading}
@@ -174,6 +179,7 @@ export default function DashboardPage() {
               <div className="lg:col-span-4">
                 <CategoryAnalytics
                   data={expenseBreakdown}
+                  budgetProgress={budgetProgress}
                   totalIncome={summary?.totalIncome}
                   totalExpense={summary?.totalExpenses}
                   isLoading={isLoading}
@@ -205,7 +211,7 @@ export default function DashboardPage() {
 
               <div className="flex flex-col items-center text-center space-y-4">
                 {/* Large initials badge */}
-                <div className="h-20 w-20 rounded-md bg-gradient-to-tr from-[#7C5CFF] to-[#00DFA2] flex items-center justify-center text-2xl font-black text-white shadow-2xl">
+                <div className="h-20 w-20 rounded-md gradient-bg flex items-center justify-center text-2xl font-black text-white shadow-2xl">
                   {user?.name ? user.name.split(" ").map(n => n[0]).join("") : "?"}
                 </div>
                 <div>

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Transaction } from "@/types/transaction";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Edit2, Trash2, ChevronLeft, ChevronRight, Utensils, ShoppingBag, Car, Tv, Lightbulb, Heart, BookOpen, TrendingUp, Briefcase, DollarSign } from "lucide-react";
+import { Edit2, Trash2, ChevronLeft, ChevronRight, Utensils, ShoppingBag, Car, Tv, Lightbulb, Heart, BookOpen, TrendingUp, Briefcase, DollarSign, Repeat } from "lucide-react";
 import { motion } from "framer-motion";
 import { format, isToday, isYesterday } from "date-fns";
 
@@ -160,12 +160,29 @@ export default function TransactionList({
                                 </span>
                               </>
                             )}
+                            {tx.tags && tx.tags.length > 0 && (
+                              <>
+                                <span className="text-[9px] text-brand-muted/50">•</span>
+                                <div className="flex items-center gap-1 flex-wrap max-w-[120px] md:max-w-[200px]">
+                                  {tx.tags.map(tag => (
+                                    <span key={tag.id} className="px-1.5 py-[1px] rounded-[4px] bg-brand-accent/10 text-brand-accent text-[8px] font-semibold tracking-wide border border-brand-accent/20">
+                                      {tag.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
 
                       {/* Right Panel: Amount & Edit/Delete actions */}
-                      <div className="flex items-center gap-4 shrink-0">
+                      <div className="flex items-center gap-3 shrink-0">
+                        {tx.isRecurring && (
+                          <div className="flex items-center text-brand-accent/80 gap-1 mr-1" title={`Recurring ${tx.recurringInterval}`}>
+                            <Repeat size={11} />
+                          </div>
+                        )}
                         <div className="text-right">
                           <span
                             className={`text-xs font-bold ${
@@ -225,7 +242,7 @@ export default function TransactionList({
             <button
               onClick={() => onPageChange(meta.page - 1)}
               disabled={meta.page <= 1}
-              className="p-1.5 rounded-md border border-brand-border bg-brand-card/40 text-brand-muted hover:text-brand-text disabled:opacity-30 transition-colors"
+              className="p-1.5 rounded-md border border-brand-border bg-brand-bg text-brand-muted hover:text-brand-text disabled:opacity-30 transition-colors"
             >
               <ChevronLeft size={14} />
             </button>
@@ -237,7 +254,7 @@ export default function TransactionList({
                 className={`h-7 w-7 rounded-md text-[10px] font-bold transition-all ${
                   meta.page === page
                     ? "bg-brand-accent text-white shadow-lg shadow-brand-accent/20"
-                    : "border border-brand-border bg-brand-card/40 text-brand-muted hover:text-brand-text"
+                    : "border border-brand-border bg-brand-bg text-brand-muted hover:text-brand-text"
                 }`}
               >
                 {page}
@@ -247,7 +264,7 @@ export default function TransactionList({
             <button
               onClick={() => onPageChange(meta.page + 1)}
               disabled={meta.page >= meta.totalPages}
-              className="p-1.5 rounded-md border border-brand-border bg-brand-card/40 text-brand-muted hover:text-brand-text disabled:opacity-30 transition-colors"
+              className="p-1.5 rounded-md border border-brand-border bg-brand-bg text-brand-muted hover:text-brand-text disabled:opacity-30 transition-colors"
             >
               <ChevronRight size={14} />
             </button>

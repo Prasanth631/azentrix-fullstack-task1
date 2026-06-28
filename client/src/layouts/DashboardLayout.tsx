@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
-import { LogOut, Sun, Moon, Home, Wallet, PieChart, User } from "lucide-react";
+import { LogOut, Sun, Moon, Home, Wallet, PieChart, User, Activity } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { getInitials } from "@/lib/utils";
@@ -34,8 +34,8 @@ export default function DashboardLayout() {
         {/* Left: Brand Logo & Name */}
         <div className="flex items-center gap-3 md:w-64">
           <Link to="/dashboard" className="flex items-center gap-2 group transition-opacity hover:opacity-80">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-[#7C5CFF] to-[#00DFA2]">
-              <span className="text-[10px] font-extrabold text-white tracking-wider">FL</span>
+            <div className="flex items-center justify-center text-brand-text">
+              <Activity size={20} strokeWidth={2.5} />
             </div>
             <h1 className="text-sm font-bold tracking-tight text-brand-text hidden sm:block">FlowLedger</h1>
           </Link>
@@ -113,8 +113,8 @@ export default function DashboardLayout() {
       {/* Main Content Area */}
       <main className="flex-1 overflow-auto relative bg-brand-bg">
         {/* Subtle background glow */}
-        <div className="absolute top-0 left-1/4 w-[40vw] h-[40vw] rounded-full bg-[#7C5CFF]/[0.02] blur-[100px] pointer-events-none z-0" />
-        <div className="absolute bottom-0 right-1/4 w-[30vw] h-[30vw] rounded-full bg-[#00DFA2]/[0.02] blur-[80px] pointer-events-none z-0" />
+        <div className="absolute top-0 left-1/4 w-[40vw] h-[40vw] rounded-full bg-brand-accent/[0.02] blur-[100px] pointer-events-none z-0" />
+        <div className="absolute bottom-0 right-1/4 w-[30vw] h-[30vw] rounded-full bg-brand-success/[0.02] blur-[80px] pointer-events-none z-0" />
         
         <div className="relative z-10 w-full max-w-7xl mx-auto p-4 md:p-8 md:pt-6">
           <Outlet />

@@ -101,17 +101,16 @@ export default function TransactionsPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-extrabold text-[#F8FAFC] tracking-tight">
-            Financial Ledger
+          <h2 className="text-2xl font-extrabold text-brand-text tracking-tight">
+            Transactions
           </h2>
-          <p className="text-xs text-[#94A3B8] font-light mt-0.5">
-            Detailed timeline of income inflows and expense cashout burns.
+          <p className="text-xs text-brand-muted font-light mt-0.5">
+            Your recent financial activity
           </p>
         </div>
         <button
-          id="add-transaction-btn"
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md text-white font-bold text-xs bg-gradient-to-tr from-[#7C5CFF] to-[#6366F1] hover:opacity-95 hover:opacity-80 transition-all"
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md bg-brand-text text-brand-bg font-bold text-xs hover:opacity-90 transition-all"
         >
           <Plus size={14} />
           <span>New Entry</span>
